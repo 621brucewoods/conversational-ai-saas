@@ -1,6 +1,6 @@
 # Chat2Geo: A ChatGPT for Remote-Sensing-Based Geospatial Analysis
 
-Chat2Geo is a **Next.js 15** application providing a **chatbot-like** user interface for performing **remote-sensing-based geospatial analyses**. It leverages **Google Earth Engine (GEE)** in the backend to process and analyze various remote sensing datasets in real time. Users can **upload their own vector data**, run advanced geospatial queries, and integrate the results with an **AI Assistant** for specialized tasks such as **land cover mapping**, **change detection**, and **air pollutant monitoring**. Chat2Geo inherits a large portion of the building blocks of the GRAI 2.0 that is under development at GeoRetina (www.georetina.com). In parallel with GRAI 2.0 (which I plan to open source-once it's stable), I will also keep this app updated for the community.
+Chat2Geo is a **Next.js 15** application providing a **chatbot-like** user interface for performing **remote-sensing-based geospatial analyses**. It leverages **Google Earth Engine (GEE)** in the backend to process and analyze various remote sensing datasets in real time. Users can **upload their own vector data**, run advanced geospatial queries, and integrate the results with an **AI Assistant** for specialized tasks such as **land cover mapping**, **change detection**, and **air pollutant monitoring**. Chat2Geo also has advanced knowledge retrieval based on Retrieval-augmented generation (RAG), which can integrate geospatial analysis with non-geospatial/textual information. Chat2Geo inherits a large portion of its building blocks from the GRAI 2.0 app that is under development at GeoRetina (www.georetina.com). In parallel with GRAI 2.0 (which I plan to open-source once it's stable), I will also keep Chat2Geo updated for the community.
 
 
 https://github.com/user-attachments/assets/d9940a0e-10c8-4d0e-9ec9-3dfd0966c664
@@ -116,7 +116,7 @@ Three sample analyses are included in this app:
 
 ## Considerations:
 
-- It should be noted that this is not for production. It may have bugs. Some functionalities have not been implemented yet.
+- It should be noted that this app is not yet ready for production. The app has known bugs, and perhaps unknown ones😁 Some functionalities have not been implemented yet.
 - There are parts that should be refactored or re-designed either because they could have been used/invoked in a better place, or because they should've been implemented in a much better manner.
 
 
