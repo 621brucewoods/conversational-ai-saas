@@ -2,6 +2,10 @@
 
 Chat2Geo is a **Next.js 15** application providing a **chatbot-like** user interface for performing **remote-sensing-based geospatial analyses**. It leverages **Google Earth Engine (GEE)** in the backend to process and analyze various remote sensing datasets in real time. Users can **upload their own vector data**, run advanced geospatial queries, and integrate the results with an **AI Assistant** for specialized tasks such as **land cover mapping**, **change detection**, and **air pollutant monitoring**. Chat2Geo inherits a large portion of the building blocks of the GRAI 2.0 that is under development at GeoRetina (www.georetina.com). In parallel with GRAI 2.0 (which I plan to open source-once completed), I will also keep this app updated for the community.
 
+
+https://github.com/user-attachments/assets/d9940a0e-10c8-4d0e-9ec9-3dfd0966c664
+
+
 ## Table of Contents
 
 - [Features](#features)
