@@ -21,8 +21,8 @@ const geistMono = localFont({
 
 // Define metadata for the root layout
 export const metadata = {
-  title: "GeoRetina Omni",
-  description: "AI-powered geospatial analytics for climate change",
+  title: "Chat2Geo Platform",
+  description: "AI-powered geospatial analyticse",
 };
 
 export default async function RootLayout({

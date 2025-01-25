@@ -18,9 +18,8 @@ const geistMono = localFont({
 
 // Define metadata for the root layout
 export const metadata = {
-  title: "Login to GeoRetina AI Platform",
-  description:
-    "Login to access AI-powered geospatial analytics for climate change",
+  title: "Login to Chat2Geo Platform",
+  description: "Login to access AI-powered geospatial analytics",
 };
 
 export default function RootLayout({
