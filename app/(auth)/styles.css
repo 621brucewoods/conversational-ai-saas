@@ -1,0 +1,93 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 47.4% 11.2%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 47.4% 11.2%;
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+    --primary-blue: 220 90% 56%;
+    --primary-blue-foreground: 210 40% 98%;
+    --primary-green: 145 63% 42%;
+    --primary-green-foreground: 210 40% 98%;
+    --secondary: 220 13% 92%; /* Neutral light gray */
+    --secondary-foreground: 220 10% 40%; /* Neutral medium gray */
+    --accent: 220 15% 85%; /* Neutral soft gray */
+    --accent-foreground: 220 20% 12%; /* Neutral deep gray */
+    --destructive: 0 100% 50%;
+    --destructive-foreground: 210 40% 98%;
+    --warning: 45 100% 50%;
+    --warning-foreground: 45 100% 15%;
+    --info: 200 98% 48%;
+    --info-foreground: 210 40% 98%;
+    --ring: 215 20.2% 65.1%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    /* Base */
+    --background: 240 2% 12%; /* #1f1f21 */
+    --foreground: 0 0% 95%; /* Very light neutral */
+
+    /* Darker variant for cards/popovers */
+    --card: 220 3% 10%; /* #18191a */
+    --card-foreground: 0 0% 95%;
+    --popover: 220 3% 10%; /* #18191a */
+    --popover-foreground: 0 0% 95%;
+
+    /* Muted */
+    --muted: 240 2% 16%; /* Slightly lighter than background */
+    --muted-foreground: 0 0% 60%; /* Subdued text */
+
+    /* Interactive elements */
+    --accent: 240 2% 18%; /* Subtle highlight */
+    --accent-foreground: 0 0% 98%;
+
+    /* Borders and rings */
+    --border: 240 2% 20%; /* Visible but subtle */
+    --input: 240 2% 20%;
+    --ring: 240 2% 20%;
+
+    /* Primary */
+    --primary: 0 0% 98%; /* Almost white */
+    --primary-foreground: 240 2% 12%; /* Same as background */
+
+    /* Secondary */
+    --secondary: 240 2% 22%; /* Lighter than accent */
+    --secondary-foreground: 0 0% 98%;
+
+    /* Semantic colors - coordinated with our neutral theme */
+    --primary-blue: 220 90% 56%;
+    --primary-blue-foreground: 210 40% 98%;
+
+    --primary-green: 145 63% 42%;
+    --primary-green-foreground: 210 40% 98%;
+
+    --destructive: 0 50% 35%; /* More muted red */
+    --destructive-foreground: 0 0% 98%;
+
+    --warning: 45 100% 50%;
+    --warning-foreground: 45 100% 15%;
+    --info: 200 98% 48%;
+    --info-foreground: 210 40% 98%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+  }
+}

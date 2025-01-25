@@ -1,0 +1,326 @@
+/* -------------------------------------------
+  Tailwind Base Imports
+------------------------------------------- */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* -------------------------------------------
+  Theme Variables & Base Styles
+------------------------------------------- */
+@layer base {
+  :root {
+    /* Light Theme Variables */
+    --background: 0 0% 100%;
+    --foreground: 222.2 47.4% 11.2%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 47.4% 11.2%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 47.4% 11.2%;
+
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+
+    --primary-blue: 220 90% 56%;
+    --primary-blue-foreground: 210 40% 98%;
+
+    --primary-green: 145 63% 42%;
+    --primary-green-foreground: 210 40% 98%;
+
+    --secondary: 220 13% 92%;
+    --secondary-foreground: 220 10% 40%;
+
+    --accent: 220 15% 85%;
+    --accent-foreground: 220 20% 12%;
+
+    --destructive: 0 100% 50%;
+    --destructive-foreground: 210 40% 98%;
+
+    --warning: 45 100% 50%;
+    --warning-foreground: 45 100% 15%;
+
+    --info: 200 98% 48%;
+    --info-foreground: 210 40% 98%;
+
+    --ring: 215 20.2% 65.1%;
+    --radius: 0.5rem;
+
+    --shimmer-highlight: rgba(255, 255, 255, 0.6);
+  }
+
+  .dark {
+    /* Dark Theme Variables */
+
+    /* Base */
+    --background: 240 2% 12%; /* #1f1f21 */
+    --foreground: 0 0% 95%; /* Very light neutral */
+
+    /* Cards/Popovers */
+    --card: 220 3% 10%; /* #18191a */
+    --card-foreground: 0 0% 95%;
+    --popover: 220 3% 10%;
+    --popover-foreground: 0 0% 95%;
+
+    /* Muted */
+    --muted: 240 2% 16%;
+    --muted-foreground: 0 0% 60%;
+
+    /* Interactive elements */
+    --accent: 240 2% 18%;
+    --accent-foreground: 0 0% 98%;
+
+    /* Borders & Rings */
+    --border: 240 2% 20%;
+    --input: 240 2% 20%;
+    --ring: 240 2% 20%;
+
+    /* Primary */
+    --primary: 0 0% 98%;
+    --primary-foreground: 240 2% 12%;
+
+    /* Secondary */
+    --secondary: 240 2% 22%;
+    --secondary-foreground: 0 0% 98%;
+
+    /* Semantic Colors */
+    --primary-blue: 220 90% 56%;
+    --primary-blue-foreground: 210 40% 98%;
+
+    --primary-green: 145 63% 42%;
+    --primary-green-foreground: 210 40% 98%;
+
+    --destructive: 0 50% 35%;
+    --destructive-foreground: 0 0% 98%;
+
+    --warning: 45 100% 50%;
+    --warning-foreground: 45 100% 15%;
+
+    --info: 200 98% 48%;
+    --info-foreground: 210 40% 98%;
+
+    --shimmer-highlight: rgba(255, 255, 255, 0.1);
+  }
+
+  /* Universal defaults */
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+  }
+}
+
+/* -------------------------------------------
+   Keyframes & Animation Classes
+------------------------------------------- */
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: 0% 0;
+  }
+}
+
+.animate-shimmer {
+  display: inline-block;
+  color: transparent;
+  background: linear-gradient(
+    90deg,
+    #1e90ff,
+    #34d399,
+    #a3e635,
+    #ffd700,
+    #ff8c00,
+    #ff69b4,
+    #ff007f,
+    #7928ca,
+    #1e90ff
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: shimmer 3s linear infinite;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.6s ease-in-out;
+}
+
+/* -------------------------------------------
+  MapLibre GL Styles
+------------------------------------------- */
+
+/* Remove default focus ring for MapLibre canvas */
+.maplibregl-canvas:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Attribution text */
+.maplibregl-ctrl-attrib-inner {
+  font-size: 12px !important;
+  white-space: nowrap;
+  padding: 2px 2px;
+}
+
+/* Popup content for light theme (default) */
+.maplibregl-popup-content {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  border-radius: var(--radius);
+  padding: 8px 10px;
+  box-shadow: 0 2px 6px hsl(var(--foreground) / 0.2);
+}
+
+.maplibregl-popup-tip {
+  border-top-color: hsl(var(--background)) !important;
+}
+
+/* Popup content for dark theme */
+:is([data-theme="dark"], .dark) .maplibregl-popup-content {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+}
+
+:is([data-theme="dark"], .dark) .maplibregl-popup-tip {
+  border-top-color: hsl(var(--background)) !important;
+}
+
+/* Scale control (light) */
+.maplibregl-ctrl.maplibregl-ctrl-scale {
+  background-color: hsl(var(--background) / 0.75);
+  border-color: hsl(var(--muted-foreground));
+  color: hsl(var(--foreground));
+}
+
+/* Base for maplibre control buttons */
+.maplibregl-ctrl button {
+  background-color: hsl(var(--background));
+}
+
+/* Control group styling (light) */
+.maplibregl-ctrl-group {
+  background: hsl(var(--background));
+  display: inline-flex !important;
+  flex-direction: row !important;
+}
+
+/* Reset button styles, remove default borders */
+.maplibregl-ctrl-group > button {
+  border: none !important;
+  border-radius: 0 !important;
+}
+
+/* Add divider between adjacent buttons */
+.maplibregl-ctrl-group > button + button {
+  border-left: 2px solid hsl(var(--border)) !important;
+}
+
+/* Round left/right edges of group */
+.maplibregl-ctrl-group > button:first-of-type {
+  border-top-left-radius: var(--radius) !important;
+  border-bottom-left-radius: var(--radius) !important;
+}
+.maplibregl-ctrl-group > button:last-of-type {
+  border-top-right-radius: var(--radius) !important;
+  border-bottom-right-radius: var(--radius) !important;
+}
+
+/* Add subtle box-shadow for group */
+.maplibregl-ctrl-group:not(:empty) {
+  box-shadow: 0 0 0 2px hsl(var(--border) / 0.1);
+}
+
+/* Dark theme overrides for scale control & buttons */
+:is([data-theme="dark"], .dark) .maplibregl-ctrl.maplibregl-ctrl-scale {
+  background-color: hsl(var(--background) / 0.75);
+  border-color: hsl(var(--muted-foreground));
+  color: hsl(var(--foreground));
+}
+:is([data-theme="dark"], .dark) .maplibregl-ctrl button {
+  background-color: hsl(var(--background));
+}
+:is([data-theme="dark"], .dark) .maplibregl-ctrl-group {
+  background: hsl(var(--background));
+}
+:is([data-theme="dark"], .dark) .maplibregl-ctrl-group:not(:empty) {
+  box-shadow: 0 0 0 2px hsl(var(--border) / 0.1);
+}
+:is([data-theme="dark"], .dark) .maplibregl-ctrl button .maplibregl-ctrl-icon {
+  filter: invert(1) brightness(100);
+}
+:is([data-theme="dark"], .dark) .maplibregl-ctrl button:hover {
+  background-color: hsl(var(--muted));
+}
+
+/* Attribution control (light) */
+.maplibregl-ctrl.maplibregl-ctrl-attrib {
+  background-color: hsl(var(--background) / 0.6);
+  border-radius: var(--radius);
+}
+.maplibregl-ctrl-attrib-inner {
+  background-color: transparent;
+  color: hsl(var(--foreground));
+  border-radius: var(--radius);
+}
+
+/* Attribution control (dark) */
+:is([data-theme="dark"], .dark) .maplibregl-ctrl.maplibregl-ctrl-attrib {
+  background-color: hsl(var(--background) / 0.6);
+  color: hsl(var(--foreground));
+  border-radius: var(--radius);
+}
+:is([data-theme="dark"], .dark) .maplibregl-ctrl-attrib-inner {
+  background-color: transparent;
+  color: hsl(var(--foreground));
+  border-radius: var(--radius);
+}
+
+/* -------------------------------------------
+  BN Container Overrides
+------------------------------------------- */
+.bn-container[data-color-scheme="light"] {
+  --bn-colors-editor-background: hsl(var(--background)) !important;
+}
+
+.bn-container[data-color-scheme="dark"] {
+  --bn-colors-editor-background: hsl(var(--background)) !important;
+}
+
+/* -------------------------------------------
+  Misc. Utilities
+------------------------------------------- */
+.custom-scrollbar {
+  scrollbar-width: thin; /* Firefox */
+}
+
+/* Loading overlay */
+.page-loading-overlay {
+  @apply fixed inset-0 z-[9999] flex items-center justify-center bg-transparent;
+}
+
+/* Loading spinner */
+.page-loading-spinner {
+  @apply inline-block h-10 w-10 animate-spin rounded-full border-4 border-blue-400 border-t-transparent;
+}
