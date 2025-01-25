@@ -49,8 +49,9 @@ https://github.com/user-attachments/assets/d9940a0e-10c8-4d0e-9ec9-3dfd0966c664
 
 ## Tech Stack
 - Google Cloud Platform (GCP):
-- Google Earth Engine (remote-sensing data invocation and processing)
-- Google VertexAI (custom AI vision models)
+   - Google Earth Engine (remote-sensing data invocation and processing)
+   - Vertex AI (custom AI vision models)
+   - Cloud Run
 - OpenAI (ChatGPT API)
 - Supabase (database and authentication)
 - LangChain (RAG)
@@ -62,9 +63,9 @@ https://github.com/user-attachments/assets/d9940a0e-10c8-4d0e-9ec9-3dfd0966c664
 
 2. Install dependencies
 
-```bash
-npm install
-```
+   ```bash
+   npm install
+   ```
 
 3. Set up the environment variables
 
