@@ -110,7 +110,8 @@ Visit http://localhost:3000 to view the application.
 Three sample analyses are included in this app: 
    1. urban heat island (UHI) analysis
    2. land-use/land-cover mapping (using Google DynamicWorld)
-   3. air pollution analysis
+   3. land-use/land-cover change mapping (using Google DynamicWorld)
+   4. air pollution analysis
 
 
 ## Considerations:
