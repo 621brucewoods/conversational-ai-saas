@@ -49,12 +49,12 @@ https://github.com/user-attachments/assets/d9940a0e-10c8-4d0e-9ec9-3dfd0966c664
 
 ## Tech Stack
 - Google Cloud Platform (GCP):
-    - Google Earth Engine (remote-sensing data invocation and processing)
-    - Google VertexAI (custom AI vision models)
-    - OpenAI (ChatGPT API)
-    - Supabase (database and authentication)
-    - LangChain (RAG)
-    - Maplibre GL (for displaying maps)
+- Google Earth Engine (remote-sensing data invocation and processing)
+- Google VertexAI (custom AI vision models)
+- OpenAI (ChatGPT API)
+- Supabase (database and authentication)
+- LangChain (RAG)
+- Maplibre GL (for displaying maps)
 
 ## Getting Started
 
