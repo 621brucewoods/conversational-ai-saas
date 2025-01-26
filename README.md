@@ -122,6 +122,6 @@ Three sample analyses are included in this app:
 - There are parts that should be refactored or re-designed either because they could have been used/invoked in a better place, or because they should've been implemented in a much better manner.
 
 
-## Contributing
+## Contributing 🛠️
 
 If you're interested in contributing to this project, please contact me at `shahabj.github@gmail.com`.
