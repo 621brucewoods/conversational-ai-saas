@@ -106,7 +106,7 @@ Visit http://localhost:3000 to view the application.
 
 
 
-## Available Analyses 📊
+## Available Geospatial Analyses 📊
 
 Three sample analyses are included in this app: 
    1. urban heat island (UHI) analysis
