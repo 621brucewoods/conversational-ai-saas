@@ -17,7 +17,7 @@ https://github.com/user-attachments/assets/d9940a0e-10c8-4d0e-9ec9-3dfd0966c664
 
 ---
 
-## Features
+## Features ✨
 
 1. **Chat-Style Interface**
 
@@ -47,7 +47,7 @@ https://github.com/user-attachments/assets/d9940a0e-10c8-4d0e-9ec9-3dfd0966c664
    - The AI Assistant can then combine geospatial insights with custom document knowledge.
 
 
-## Tech Stack
+## Tech Stack 💻
 - Google Cloud Platform (GCP):
    - Google Earth Engine (remote-sensing data invocation and processing)
    - Vertex AI (custom AI vision models)
@@ -57,7 +57,7 @@ https://github.com/user-attachments/assets/d9940a0e-10c8-4d0e-9ec9-3dfd0966c664
 - LangChain (RAG)
 - Maplibre GL (for displaying maps)
 
-## Getting Started
+## Getting Started 🚀
 
 1. Clone the repo
 
@@ -106,7 +106,7 @@ Visit http://localhost:3000 to view the application.
 
 
 
-## Current Analyses
+## Available Analyses 📊
 
 Three sample analyses are included in this app: 
    1. urban heat island (UHI) analysis
@@ -115,7 +115,7 @@ Three sample analyses are included in this app:
    4. air pollution analysis
 
 
-## Considerations:
+## Considerations💡
 
 - It should be noted that this app is not yet ready for production. The app has known bugs, and perhaps unknown ones😁 Some functionalities have not been implemented yet.
 - GEE-based geospatial analyses are just simple examples of how such analyses can be implemented and added. Some of them are using data that may not be up-to-date. As a result, care should be taken while interpreting the results.
