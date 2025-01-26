@@ -91,10 +91,10 @@ https://github.com/user-attachments/assets/d9940a0e-10c8-4d0e-9ec9-3dfd0966c664
 
 - For feedback submission, I just used a simple email-based pipeline based on Mailgun (skip this part if you don't want this feature):
 
-     MAILGUN_API_KEY=
-     MAILGUN_DOMAIN=
-     RECIPIENT_EMAIL=
-     SENDER_EMAIL=
+        MAILGUN_API_KEY=
+        MAILGUN_DOMAIN=
+        RECIPIENT_EMAIL=
+        SENDER_EMAIL=
 
 3. Run the develpment server
 
