@@ -104,7 +104,11 @@ npm run dev
 
 Visit http://localhost:3000 to view the application.
 
+## How to Setup Database & Authentication 🛢️
 
+As mentioned above, the database (PostgreSQL) and authentication are both hosted on Supabase. To set up them, you can either use the local dev (https://supabase.com/docs/guides/local-development/cli/getting-started) or online (https://supabase.com/docs/guides/database/overview).
+To set up the database and Supabase auth online, you need to create a supabase project & create the required databases and auth. 
+You can find the database schema of the app in the `db-schema` folder.
 
 ## Available Geospatial Analyses 📊
 
