@@ -7,7 +7,7 @@ Here are the instructions on how to contribute to this project to ensure consist
 1. Fork this repo (click the "Fork" button on top-right).
 2. Clone your fork:
    ```bash
-   git clone https://github.com/ShahabEJ/chat2geo.git
+   https://github.com/GeoRetina/chat2geo.git
 
 ## 3. Pick an issue or be assigned one
   - You can either pick an issue to work on or be assigned one.
