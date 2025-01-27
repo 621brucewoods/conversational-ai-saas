@@ -6,6 +6,13 @@ Chat2Geo is a **Next.js 15** application providing a **chatbot-like** user inter
 https://github.com/user-attachments/assets/d9940a0e-10c8-4d0e-9ec9-3dfd0966c664
 
 
+
+## Contributing 🛠️
+
+ - If you're interested in contributing to this project, please contact me at `shahabj.github@gmail.com`.
+ - If you are a new contributor, please first check out our [Contributing Guidelines](./CONTRIBUTING.md) to get started.
+
+
 ## Table of Contents
 
 - [Features](#features)
@@ -13,7 +20,6 @@ https://github.com/user-attachments/assets/d9940a0e-10c8-4d0e-9ec9-3dfd0966c664
 - [Getting Started](#getting-started)
 - [Current Analyses](#current-analyses)
 - [Considerations](#considerations)
-- [Contributing](#contributing)
 
 ---
 
@@ -125,7 +131,3 @@ Three sample analyses are included in this app:
 - GEE-based geospatial analyses are just simple examples of how such analyses can be implemented and added. Some of them are using data that may not be up-to-date. As a result, care should be taken while interpreting the results.
 - There are parts that should be refactored or re-designed either because they could have been used/invoked in a better place, or because they should've been implemented in a much better manner.
 
-
-## Contributing 🛠️
-
-If you're interested in contributing to this project, please contact me at `shahabj.github@gmail.com`.
