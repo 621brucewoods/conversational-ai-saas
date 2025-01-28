@@ -58,9 +58,11 @@ https://github.com/user-attachments/assets/d9940a0e-10c8-4d0e-9ec9-3dfd0966c664
    - Google Earth Engine (remote-sensing data invocation and processing)
    - Vertex AI (custom AI vision models)
    - Cloud Run
+- Vercel AI
 - OpenAI (ChatGPT API)
 - Supabase (database and authentication)
 - LangChain (RAG)
+- Turf (for spatial operations)
 - Maplibre GL (for displaying maps)
 
 ## Getting Started 🚀
