@@ -117,17 +117,21 @@ https://github.com/user-attachments/assets/d9940a0e-10c8-4d0e-9ec9-3dfd0966c664
 
 5. Run the develpment server
 
-```bash
-npm run dev
-```
+       npm run dev
+
 
 Visit http://localhost:3000 to view the application.
 
-## How to Set up Database & Authentication 🛢️
+## How to Set up Supabase Database, Storage Bucket, & Authentication 🛢️
+
+Supabase has a free-tier, generous plan that you can use to work with the app.
 
 As mentioned above, the database (PostgreSQL) and authentication are both hosted on Supabase. To set up them, you can either use the local dev (https://supabase.com/docs/guides/local-development/cli/getting-started) or online (https://supabase.com/docs/guides/database/overview).
 To set up the database and Supabase auth online, you need to create a supabase project & create the required databases and auth. 
 You can find the database schema of the app in the `db-schema` folder.
+
+If you want to also use the Knowledge Base feature, you need to create a storage bucket on Supabase as well. The name of the bucket should be `documents_bucket`. This is where the PDF docs you upload to the Knowledge Base are stored. You can set up the bucket by going to the following link:
+ - https://supabase.com/dashboard/project/_/storage/buckets
 
 ## Available Geospatial Analyses 📊
 
