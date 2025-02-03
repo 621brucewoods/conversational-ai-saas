@@ -144,8 +144,71 @@ Three sample analyses are included in this app:
 
 ## Considerations💡
 
-- It should be noted that this app is not yet ready for production. The app has known bugs, and perhaps unknown ones😁 Some functionalities have not been implemented yet.
+- It should be noted that this app is not yet ready for production. The app has known bugs, and perhaps unknown ones 😁 Some functionalities have not been implemented yet.
 - I may have forgotten to include some steps in setting up the app! 😅 If there's missing information in the instructions, please open an issue and let me know to update the instructions accordingly.
 - GEE-based geospatial analyses are just simple examples of how such analyses can be implemented and added. Some of them are using data that may not be up-to-date. As a result, care should be taken while interpreting the results.
 - There are parts that should be refactored or re-designed either because they could have been used/invoked in a better place, or because they should've been implemented in a much better manner.
+
+
+## Frequently Asked Questions (FAQ) 📌 
+
+### 🔹 General Questions
+
+ #### ❓ Is this project free to use?
+ *Yes! This open-source version is free to use under the terms of its license. However, note that Google Earth Engine has restrictions on commercial usage.*
+
+---
+
+### 🔹 Support & Contributions
+
+#### ❓ How can I get support for issues?
+- *If you encounter a bug or have a feature request, please* **[open an issue](../../issues)** *on GitHub.*
+- *For other questions, feel free to reach out at* **[shahabj.github@gmail.com](mailto:shahabj.github@gmail.com)**.
+
+#### ❓ How can I contribute?
+*We welcome contributions! Please check out the* **[Contributing Guidelines](./CONTRIBUTING.md)** *before submitting a pull request or opening an issue. Your help in improving this project is greatly appreciated.*
+
+---
+
+### 🔹 Features & Customization
+
+ #### ❓ Can I request additional analyses or features?
+   *Absolutely! You can:*
+   - *Suggest a feature by opening an issue.*
+   - *Fork the repository and implement your own changes.*
+
+ *For advanced or custom solutions, please see* **[GRAI 2.0 (Enterprise Version)](#enterprise-version-grai-20)** *below.*
+
+ #### ❓ Can I use my own geospatial datasets?
+ *Yes! The app allows you to import vector data and integrate it with Google Earth Engine for custom analyses. For raster data, at least for now, you need to either host them on GEE or a GCP bucket.*
+
+---
+
+### 🔹 Enterprise Version: GRAI 2.0
+
+#### ❓ What is GRAI 2.0?
+*GRAI 2.0 is the enterprise version of this project, offering:*
+- *Custom-built solutions tailored to specific client needs.*
+- *Additional analyses & AI models not included in the open-source version.*
+- *Continuous updates & premium support.*
+
+#### ❓ How do I get access to GRAI 2.0?
+*For enterprise inquiries, please visit* **[GeoRetina Contact Page](https://www.georetina.com/contact)**.
+
+---
+
+### 🔹 Technical & Setup Questions
+
+#### ❓ I'm facing issues with setup. What should I do?
+1. *Check that your environment variables are properly set in* `.env.local`.
+2. *Check your database configurations.
+3. *Confirm your Google Earth Engine configuration.*
+4. *Refer to the* **[Getting Started](#getting-started-🚀)** *section in this README.*
+5. *If issues persist,* **[open an issue](../../issues)**.
+
+---
+
+*Have a question not listed here? Feel free to* **[open an issue](../../issues)** *or reach out via email!* 🚀
+
+
 
