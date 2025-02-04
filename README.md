@@ -163,6 +163,7 @@ Three sample analyses are included in this app:
 
 #### ❓ How can I get support for issues?
 - *If you encounter a bug or have a feature request, please* **[open an issue](../../issues)** *on GitHub.*
+- *Please be as detailed as possible when describing your issue. When asking for help, include screenshots, step-by-step explanations, error logs, and any relevant details.* ***Abstract or vague questions will not be answered.***
 - *For other questions, feel free to reach out at* **[shahabj.github@gmail.com](mailto:shahabj.github@gmail.com)**.
 
 #### ❓ How can I contribute?
@@ -201,7 +202,7 @@ Three sample analyses are included in this app:
 
 #### ❓ I'm facing issues with setup. What should I do?
 1. *Check that your environment variables are properly set in* `.env.local`.
-2. *Check your database configurations.
+2. *Check your database configurations.*
 3. *Confirm your Google Earth Engine configuration.*
 4. *Refer to the* **[Getting Started](#getting-started)** *section in this README.*
 5. *If issues persist,* **[open an issue](../../issues)**.
