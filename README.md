@@ -82,7 +82,7 @@ https://github.com/user-attachments/assets/d9940a0e-10c8-4d0e-9ec9-3dfd0966c664
    npm install
    ```
 
-3. Create a Google Earth Engine (GEE) account and project. Note that GEE is currently only free for non-commercial use:
+3. Create a Google Earth Engine (GEE) account and project, otherwise no analysis can be done. Note that GEE is currently only free for non-commercial use:
    - https://earthengine.google.com
    
 5. Set up the environment variables
@@ -143,7 +143,7 @@ Three sample analyses are included in this app:
 
 
 ## Considerations💡
-
+- Note that all remote-sensing geospatial analyses, at least for now, are based on GEE in this app. So, if you don't set up your GEE environment correctly, no analysis can be done.
 - It should be noted that this app is not yet ready for production. The app has known bugs, and perhaps unknown ones 😁 Some functionalities have not been implemented yet.
 - I may have forgotten to include some steps in setting up the app! 😅 If there's missing information in the instructions, please open an issue and let me know to update the instructions accordingly.
 - GEE-based geospatial analyses are just simple examples of how such analyses can be implemented and added. Some of them are using data that may not be up-to-date. As a result, care should be taken while interpreting the results.
@@ -203,7 +203,7 @@ Three sample analyses are included in this app:
 1. *Check that your environment variables are properly set in* `.env.local`.
 2. *Check your database configurations.
 3. *Confirm your Google Earth Engine configuration.*
-4. *Refer to the* **[Getting Started](#getting-started-🚀)** *section in this README.*
+4. *Refer to the* **[Getting Started](#getting-started)** *section in this README.*
 5. *If issues persist,* **[open an issue](../../issues)**.
 
 ---
