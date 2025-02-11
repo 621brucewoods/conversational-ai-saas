@@ -4,14 +4,17 @@ import { NextRequest } from "next/server";
 import { geeAuthenticate } from "@/features/maps/utils/authentication-utils/gee-auth";
 import { urbanHeatIslandAnalysis } from "@/lib/geospatial/gee/analysis-functions/heat-analysis/urban-heat-island-analysis";
 import { airPollutionAnalysis } from "@/lib/geospatial/gee/analysis-functions/pollution-analysis/air-pollution-analysis";
+import { sentinelLandcoverLanduseMapping } from "@/lib/geospatial/gee/analysis-functions/lancover-landuse-mapping/sentinel-landcover-landuse-mapping";
 import { convertToEeGeometry } from "@/features/maps/utils/geometry-utils";
 import googleDynamicWorldMapping from "@/lib/geospatial/gee/analysis-functions/lancover-landuse-mapping/google-dynamic-world-landcover-mapping";
 import landcoverChangeMapping from "@/lib/geospatial/gee/analysis-functions/lancover-landuse-mapping/landcover-change-mapping";
 
+const validAnalysisOptionsForVulnerabilityMapBuilder: MultiAnalysisOptionsTypeForVulnerabilityMapBuilderType[] =
+  ["Air Pollutants", "Flood Risk", "Urban Heat Island (UHI)"];
 const validAnalysisOptionsForAtmosphericGasAnalysis: MultiAnalysisOptionsTypeForAirPollutantsAnalysisType[] =
   ["CO", "NO2", "CH4", "Aerosols"];
 
-export async function GET(req: NextRequest) {
+export async function POST(req: NextRequest) {
   const supabase = await createClient();
 
   const { data, error } = await supabase.auth.getUser();
@@ -20,37 +23,55 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Unauthenticated!" }, { status: 401 });
   }
 
-  let geometry: any = null;
+  // Parse the request body as JSON
+  let body;
+  try {
+    body = await req.json();
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+  }
 
-  const functionType = req.nextUrl.searchParams.get("functionType") || "";
-  const selectedRoiGeometry =
-    req.nextUrl.searchParams.get("selectedRoiGeometry") || "";
+  const {
+    functionType,
+    selectedRoiGeometry,
+    aggregationMethod,
+    startDate1,
+    endDate1,
+    startDate2,
+    endDate2,
+    multiAnalysisOptions,
+  } = body;
 
-  if (selectedRoiGeometry && selectedRoiGeometry !== "undefined") {
-    const geometryString = decodeURIComponent(selectedRoiGeometry);
-    geometry = JSON.parse(geometryString);
-  } else {
-    throw new Error(
-      "No Region of Interest (ROI) was selected for the analysis. Please provide an ROI and try again."
+  // Validate the ROI geometry
+  if (!selectedRoiGeometry) {
+    return NextResponse.json(
+      {
+        error:
+          "No Region of Interest (ROI) was provided. Please provide an ROI.",
+      },
+      { status: 400 }
     );
   }
 
-  const aggregationMethod =
-    req.nextUrl.searchParams.get("aggregationMethod") || "";
-  const startDate1 = req.nextUrl.searchParams.get("startDate1") || "";
-  const endDate1 = req.nextUrl.searchParams.get("endDate1") || "";
-  const startDate2 = req.nextUrl.searchParams.get("startDate2") || "";
-  const endDate2 = req.nextUrl.searchParams.get("endDate2") || "";
-  const multiAnalysisOptionsString =
-    req.nextUrl.searchParams.get("multiAnalysisOptions") || "";
-  const multiAnalysisOptions = multiAnalysisOptionsString
-    ? JSON.parse(decodeURIComponent(multiAnalysisOptionsString))
-    : [];
+  // If the geometry comes in as a string, decode and parse it
+  let geometry = selectedRoiGeometry;
+  if (typeof selectedRoiGeometry === "string") {
+    try {
+      const geometryString = decodeURIComponent(selectedRoiGeometry);
+      geometry = JSON.parse(geometryString);
+    } catch (err) {
+      return NextResponse.json(
+        { error: "Invalid geometry JSON" },
+        { status: 400 }
+      );
+    }
+  }
 
   try {
     await initializeGee();
 
-    const convertedGeometry = convertToEeGeometry(geometry);
+    const eeReadyGeometry = convertToEeGeometry(geometry);
 
     let result;
     switch (functionType) {
@@ -79,7 +100,7 @@ export async function GET(req: NextRequest) {
         break;
       case "Land Use/Land Cover Maps":
         result = await googleDynamicWorldMapping(
-          convertedGeometry,
+          eeReadyGeometry,
           startDate1,
           endDate1
         );
@@ -87,7 +108,7 @@ export async function GET(req: NextRequest) {
 
       case "Land Use/Land Cover Change Maps":
         result = await landcoverChangeMapping(
-          convertedGeometry,
+          eeReadyGeometry,
           startDate1,
           endDate1,
           startDate2,
@@ -97,18 +118,20 @@ export async function GET(req: NextRequest) {
 
       case "Urban Heat Island (UHI) Analysis":
         result = await urbanHeatIslandAnalysis(
-          convertedGeometry,
+          eeReadyGeometry,
           startDate1,
           endDate1,
           aggregationMethod as AggregationMethodTypeNumerical
         );
         break;
+
       default:
         throw new Error("Invalid function type");
     }
 
     return NextResponse.json(result, { status: 200 });
   } catch (error: any) {
+    console.error(error);
     return NextResponse.json({ result: error.message }, { status: 404 });
   }
 }

@@ -10,12 +10,16 @@ export const initializeMap = (containerId: string): maplibregl.Map => {
       sources: {
         "google-satellite-imagery": {
           type: "raster",
-          tiles: ["/api/basemaps/google-basemaps/satellite?z={z}&x={x}&y={y}"],
+          tiles: [
+            "/api/services/google-maps/basemaps/satellite?z={z}&x={x}&y={y}",
+          ],
           tileSize: 256,
         },
         "osm-tiles": {
           type: "raster",
-          tiles: ["/api/basemaps/google-basemaps/roadmap?z={z}&x={x}&y={y}"],
+          tiles: [
+            "/api/services/google-maps/basemaps/roadmap?z={z}&x={x}&y={y}",
+          ],
           tileSize: 256,
         },
       },
@@ -44,7 +48,7 @@ export const initializeMap = (containerId: string): maplibregl.Map => {
     },
 
     center: [-76.493, 44.2334],
-    zoom: 10,
+    zoom: 2,
     pitch: 0,
     bearing: 0,
     antialias: true,

@@ -2,20 +2,29 @@ import { create } from "zustand";
 import useROIStore from "./use-roi-store";
 import useMapLayersStore from "./use-map-layer-store";
 
+export interface AddressSearchProps {
+  lat: number;
+  lng: number;
+}
+
 interface ZoomInLayerState {
-  zoomRequestWithGeometry: ROIGeometry | null;
-  setZoomRequestWithGeometry: (layerName: string | null) => void;
+  zoomToLayerRequestWithGeometry: ROIGeometry | null;
+  setZoomToLayerRequestWithGeometry: (layerName: string | null) => void;
+
+  zoomToAddressRequest: AddressSearchProps | null;
+  setZoomToAddressRequest: (coordinates: AddressSearchProps | null) => void;
 
   zoomRequestFromTable: Feature | null;
   setZoomRequestFromTable: (feature: Feature | null) => void;
 
-  // ← Add the reset method
+  // Reset method to revert the store to initial state
   reset: () => void;
 }
 
 // Define the initial defaults for easy reference
 const initialState = {
-  zoomRequestWithGeometry: null as ROIGeometry | null,
+  zoomToLayerRequestWithGeometry: null as ROIGeometry | null,
+  zoomToAddressRequest: null as AddressSearchProps | null,
   zoomRequestFromTable: null as Feature | null,
 };
 
@@ -26,8 +35,9 @@ const useZoomRequestStore = create<ZoomInLayerState>((set) => ({
     set({ zoomRequestFromTable: feature });
   },
 
-  setZoomRequestWithGeometry: (layerName) => {
-    set({ zoomRequestWithGeometry: null });
+  setZoomToLayerRequestWithGeometry: (layerName) => {
+    // Clear any existing geometry
+    set({ zoomToLayerRequestWithGeometry: null });
     if (!layerName) {
       return;
     }
@@ -46,7 +56,12 @@ const useZoomRequestStore = create<ZoomInLayerState>((set) => ({
 
     const geometry = useROIStore.getState().getRoiGeometryByName(roiName);
 
-    set({ zoomRequestWithGeometry: geometry });
+    set({ zoomToLayerRequestWithGeometry: geometry });
+  },
+
+  // Setter for zoomToAddressRequest using AddressSearchProps
+  setZoomToAddressRequest: (coordinates) => {
+    set({ zoomToAddressRequest: coordinates });
   },
 
   // Reset method to revert the store to initial state

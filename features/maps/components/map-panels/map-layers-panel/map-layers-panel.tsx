@@ -41,10 +41,11 @@ import { cn } from "@/lib/utils";
 // ---- stores ----
 import useMapDisplayStore from "@/features/maps/stores/use-map-display-store";
 import useMapLayersStore from "@/features/maps/stores/use-map-layer-store";
-import useZoomRequestStore from "@/features/maps/stores/use-map-layer-zoom-request-store";
+import useZoomRequestStore from "@/features/maps/stores/use-map-zoom-request-store";
 import useColorPickerStore from "@/features/maps/stores/use-color-picker-store";
 import useROIStore from "@/features/maps/stores/use-roi-store";
 import useLayerSelectionStore from "@/features/maps/stores/use-layer-selection-store";
+import { useAttachmentStore } from "@/features/chat/stores/use-attachments-store";
 
 // ---- components ----
 import Legend from "./map-legend";
@@ -99,13 +100,17 @@ export default function MapLayersPanel() {
   );
   const reorderLayers = useMapLayersStore((state) => state.reorderLayers);
   const removeMapLayer = useMapLayersStore((state) => state.removeMapLayer);
-  const setZoomRequestWithGeometry = useZoomRequestStore(
-    (state) => state.setZoomRequestWithGeometry
+  const setZoomToLayerRequestWithGeometry = useZoomRequestStore(
+    (state) => state.setZoomToLayerRequestWithGeometry
   );
   const setSelectRasterLayer = useLayerSelectionStore(
     (state) => state.setSelectRasterLayer
   );
   const isROIDrawingActive = useROIStore((state) => state.isROIDrawingActive);
+
+  const removeAttachedLayer = useAttachmentStore(
+    (state) => state.removeAttachment
+  );
 
   // Color picker store
   const { pickedColor, setPickedColor } = useColorPickerStore();
@@ -162,12 +167,16 @@ export default function MapLayersPanel() {
 
   // Zoom
   const handleZoomToLayer = (layerName: string) => {
-    setZoomRequestWithGeometry(layerName);
+    setZoomToLayerRequestWithGeometry(layerName);
   };
 
   // Delete
   const handleDeleteLayer = (layerName: string) => {
     removeMapLayer(layerName);
+    const mapLayer = mapLayers.find((layer) => layer.name === layerName);
+    if (mapLayer?.type === "roi") {
+      removeAttachedLayer(layerName);
+    }
   };
 
   // Close the panel if the ROI drawing
