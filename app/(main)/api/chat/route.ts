@@ -19,7 +19,11 @@ import {
   saveChat,
   saveMessages,
 } from "@/lib/database/chat/queries";
-import { getUsageForUser, getUserRoleAndTier } from "@/lib/database/usage";
+import {
+  getUsageForUser,
+  getUserRoleAndTier,
+  incrementRequestCount,
+} from "@/lib/database/usage";
 import { getPermissionSet } from "@/lib/auth";
 
 import {
@@ -84,6 +88,9 @@ export async function POST(request: Request) {
 
   const coreMessages = convertToCoreMessages(messages);
   const userMessage = getMostRecentUserMessage(coreMessages);
+
+  // Increment usage count
+  await incrementRequestCount(userId);
 
   if (!chat) {
     const generatedTitle = await generateTitleFromUserMessage({
