@@ -7,14 +7,6 @@ interface GeospatialAnalysisResult {
   uhiMetrics?: any;
 }
 
-interface ToolCallingMessageResults {
-  geospatialAnalysis?: GeospatialAnalysisResult;
-  citationSources?: Source[];
-  draftedReport?: string;
-  toolCallTitle?: string;
-  reportFileName?: string;
-}
-
 export function validateToolCallingResults(
   messageResults: ToolCallingMessageResults
 ): Record<string, boolean> {
@@ -30,8 +22,17 @@ export function validateToolCallingResults(
     validationResults.geospatialAnalysis = false;
   }
 
-  // Validate citationSources
+  if (messageResults.geospatialData) {
+    const { urlFormat, layerName, legendConfig } =
+      messageResults.geospatialData;
+    validationResults.geospatialData =
+      !!urlFormat && !!layerName && !!legendConfig;
+  } else {
+    validationResults.geospatialData = false;
+  }
+
   if (messageResults.citationSources) {
+    // Validate citationSources
     validationResults.citationSources = Array.isArray(
       messageResults.citationSources
     );

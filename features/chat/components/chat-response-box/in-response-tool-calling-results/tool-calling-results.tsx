@@ -19,6 +19,8 @@ const ToolCallingResults = React.memo(
 
     const geospatialAnalysis = messageResults?.geospatialAnalysis;
 
+    const geospatialData = messageResults?.geospatialData;
+
     const validationResults = validateToolCallingResults(messageResults);
 
     if (!Object.values(validationResults).some((isValid) => isValid)) {
@@ -40,6 +42,16 @@ const ToolCallingResults = React.memo(
             <div className="w-full flex justify-start ml-20">
               <DisplayInChatAnalysisMapBtn
                 analysisLayerName={geospatialAnalysis.layerName || ""}
+              />
+            </div>
+          </div>
+        )}
+
+        {geospatialData && validationResults.geospatialData && (
+          <div className="flex flex-col h-full gap-8 justify-center items-center">
+            <div className="w-full flex justify-start ml-20">
+              <DisplayInChatAnalysisMapBtn
+                analysisLayerName={geospatialData.layerName || ""}
               />
             </div>
           </div>

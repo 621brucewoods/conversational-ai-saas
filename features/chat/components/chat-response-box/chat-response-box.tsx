@@ -108,7 +108,10 @@ const ChatResponseBox = ({ chatId, initialMessages }: ChatResponseBoxProps) => {
   const [toolCallIdToMessageIdsMap, setToolCallIdToMessageIdsMap] = useState<{
     [key: string]: Set<string>;
   }>({});
+
   const [isAutoScrollEnabled, setIsAutoScrollEnabled] = useState(true);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const isUserScrolling = useRef(false);
 
   const { messages, input, handleInputChange, handleSubmit, isLoading } =
     useChat({
@@ -144,6 +147,41 @@ const ChatResponseBox = ({ chatId, initialMessages }: ChatResponseBoxProps) => {
       },
     });
 
+  // Auto-scroll to the bottom of the chat box when new messages are added
+  useEffect(() => {
+    if (isAutoScrollEnabled && messagesEndRef.current && isChatStarted) {
+      isUserScrolling.current = true;
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+
+      // Reset the user scrolling flag after animation completes
+      setTimeout(() => {
+        isUserScrolling.current = false;
+      }, 100);
+    }
+  }, [messages, isAutoScrollEnabled, isChatStarted]);
+
+  // Check if the user is scrolling up to disable auto-scroll
+  useEffect(() => {
+    const scrollContainer = scrollContainerRef.current;
+    if (!scrollContainer) return;
+
+    const handleScroll = () => {
+      if (!isUserScrolling.current) {
+        const { scrollTop, scrollHeight, clientHeight } = scrollContainer;
+        const isAtBottom =
+          Math.abs(scrollHeight - scrollTop - clientHeight) < 100;
+
+        if (!isAtBottom) {
+          setIsAutoScrollEnabled(false);
+        }
+      }
+    };
+
+    scrollContainer.addEventListener("scroll", handleScroll);
+    return () => scrollContainer.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Handle sending a message
   const handleSendMessage = useCallback(() => {
     if (!isChatStarted) {
       setIsChatStarted(true);
@@ -166,14 +204,13 @@ const ChatResponseBox = ({ chatId, initialMessages }: ChatResponseBoxProps) => {
         preventDefault: () => {},
       } as React.FormEvent<HTMLFormElement>;
 
-      startTransition(() => {
-        setIsAutoScrollEnabled(true);
-      });
+      setIsAutoScrollEnabled(true);
 
       handleSubmit(syntheticEvent);
     }
   }, [input, handleSubmit]);
 
+  // Handle sending a message on Enter key press
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
       if (event.key === "Enter" && !event.shiftKey) {
@@ -184,6 +221,7 @@ const ChatResponseBox = ({ chatId, initialMessages }: ChatResponseBoxProps) => {
     [handleSendMessage]
   );
 
+  // Open the artifacts sidebar with the raw map
   const handleOpenArtifactsSidebarWithRawMap = () => {
     toggleArtifactsSidebar();
     setDisplayRawMapRequestedFromInsightsViewerIcon(true);
@@ -222,13 +260,6 @@ const ChatResponseBox = ({ chatId, initialMessages }: ChatResponseBoxProps) => {
     },
     [toolCallIdToMessageIdsMap, pendingToolCallIds]
   );
-
-  // Auto-scroll to the bottom of the chat box when new messages are added
-  useEffect(() => {
-    if (isAutoScrollEnabled && messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
-    }
-  }, [messages, isAutoScrollEnabled]);
 
   // Collect the results of the tool calls
   useEffect(() => {
@@ -286,7 +317,7 @@ const ChatResponseBox = ({ chatId, initialMessages }: ChatResponseBoxProps) => {
 
         switch (toolName) {
           /////////////////////////////////////////////////////////////////////////
-          // Handle Geospatial ANALYSIS
+          // 1. Handle Geospatial ANALYSIS
           /////////////////////////////////////////////////////////////////////////
           case "requestGeospatialAnalysis": {
             const {
@@ -369,7 +400,73 @@ const ChatResponseBox = ({ chatId, initialMessages }: ChatResponseBoxProps) => {
           }
 
           /////////////////////////////////////////////////////////////////////////
-          // Handle RAG QUERY
+          // 2. Handle Geospatial DATA LOADING
+          /////////////////////////////////////////////////////////////////////////
+          case "requestLoadingGeospatialData": {
+            const {
+              urlFormat,
+              legendConfig,
+              mapStats,
+              layerName,
+              datasetId,
+              startDate,
+              endDate,
+              geospatialDataType,
+              selectedRoiGeometry,
+            } = result;
+
+            startTransition(() => {
+              // Update message results for data loading
+              setMessageResults((prev) => ({
+                ...prev,
+                [lastMessageId]: {
+                  ...prev[lastMessageId],
+                  geospatialData: {
+                    urlFormat,
+                    legendConfig,
+                    mapStats,
+                    layerName,
+                    datasetId,
+                    geospatialDataType,
+                  },
+                },
+              }));
+
+              // Possibly use a separate utility if you want different handling
+              // for "data loading" vs "analysis."
+              addNewGeeOutput({
+                urlFormat,
+                mapStats,
+                legendConfig,
+                layerName,
+              });
+
+              addFunctionConfig({
+                functionType: geospatialDataType,
+                layerName,
+                selectedRoiGeometry: selectedRoiGeometry?.geometry || null,
+                startDate,
+                endDate,
+                legendConfig,
+              });
+
+              addMapLayer({
+                id: generateUUID(),
+                layerFunctionType: geospatialDataType,
+                name: layerName,
+                visible: true,
+                type: "raster",
+                mapStats,
+                roiName: selectedRoiGeometry?.name || "",
+              });
+
+              addLegend(layerName, legendConfig);
+            });
+            break;
+          }
+
+          /////////////////////////////////////////////////////////////////////////
+          // 3. Handle RAG QUERY
           /////////////////////////////////////////////////////////////////////////
           case "requestRagQuery": {
             let sources = result.data;
@@ -392,7 +489,7 @@ const ChatResponseBox = ({ chatId, initialMessages }: ChatResponseBoxProps) => {
           }
 
           /////////////////////////////////////////////////////////////////////////
-          // Handle DRAFT REPORT
+          // 4. Handle DRAFT REPORT
           /////////////////////////////////////////////////////////////////////////
           case "draftReport": {
             const { report, reportFileName } = result;
@@ -417,6 +514,7 @@ const ChatResponseBox = ({ chatId, initialMessages }: ChatResponseBoxProps) => {
     processResults();
   }, [pendingResults, toolCallIdToMessageIdsMap]);
 
+  // Replaced the previous logic with a more robust one that can handle multiple tool call sequences
   useEffect(() => {
     let localActiveToolCallId: string | null = null;
     const newToolCallIdToMessageIdsMap: { [key: string]: Set<string> } = {};
@@ -466,7 +564,7 @@ const ChatResponseBox = ({ chatId, initialMessages }: ChatResponseBoxProps) => {
               name: name,
               visible: true,
               type: "roi",
-              layerOpacity: 0.8,
+              layerOpacity: 1,
               roiName: null,
             });
 
@@ -511,6 +609,7 @@ const ChatResponseBox = ({ chatId, initialMessages }: ChatResponseBoxProps) => {
       }`}
     >
       <div
+        ref={scrollContainerRef}
         className={`
         flex flex-col items-center justify-center h-screen
         overflow-y-scroll w-full p-2
