@@ -9,7 +9,7 @@ import React, {
 } from "react";
 
 import { ToolInvocation } from "ai";
-import { useChat } from "ai/react";
+import { useChat } from "@ai-sdk/react";
 import ChatInputBox from "../input/chat-input-box";
 import { IconDeviceAnalytics } from "@tabler/icons-react";
 import { useGeeOutputStore } from "@/features/maps/stores/use-gee-ouput-store";
