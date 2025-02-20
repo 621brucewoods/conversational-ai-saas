@@ -18,7 +18,6 @@ export const addGeocodedPointToMap = async (
     map.removeSource(layerName);
   }
 
-  console.log("Adding geocoded point to map:", geojsonData);
   // Add the new GeoJSON source.
   map.addSource(layerName, {
     type: "geojson",
