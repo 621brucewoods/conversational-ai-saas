@@ -5,7 +5,6 @@ import {
   type CoreUserMessage,
   streamText,
   convertToCoreMessages,
-  generateText,
 } from "ai";
 
 import { createClient } from "@/utils/supabase/server";
@@ -13,11 +12,11 @@ import { z } from "zod";
 
 import { NextResponse } from "next/server";
 
-import { answerQuery } from "@/app/actions/rag-actions";
 import {
   getChatById,
   saveChat,
   saveMessages,
+  searchGeeDatasets,
 } from "@/lib/database/chat/queries";
 import {
   getUsageForUser,
@@ -25,7 +24,13 @@ import {
   incrementRequestCount,
 } from "@/lib/database/usage";
 import { getPermissionSet } from "@/lib/auth";
-
+import {
+  requestGeospatialAnalysis,
+  requestLoadingGeospatialData,
+  requestRagQuery,
+  draftReport,
+  requestWebScraping,
+} from "@/lib/database/chat/tools";
 import {
   generateUUID,
   sanitizeResponseMessages,
@@ -33,10 +38,6 @@ import {
   generateTitleFromUserMessage,
   getFormattedDate,
 } from "@/features/chat/utils/general-utils";
-import {
-  calculateGeometryArea,
-  checkGeometryAreaIsLessThanThreshold,
-} from "@/features/maps/utils/geometry-utils";
 
 // export const maxDuration = 30;
 
@@ -112,18 +113,19 @@ export async function POST(request: Request) {
   });
 
   // System instructions
-  const systemInstructions = `You are an AI Assistant specializing in geospatial analytics for climate change. Today is ${getFormattedDate()}.
-  Be kind, warm, and professional. Use emojis where appropriate to enhance user experience.
-  When user asks for a geospatial analysis, never ask for the location unless you run the analysis and you get a corresponding error. Users provide the name of the region of interest (ROI) layer in the request.
-  Always highlight important outputs and provide help in interpreting results. Don't include URLs or legends in your responses.
-  Refuse to answer questions irrelevant to geospatial analytics or the platform's context. You have access to several tools. If running a tool fails, don't re-run it. Instead, provide a clear explanation to the user.
+  const systemInstructions = `Today is ${getFormattedDate()}. You are an AI Assistant specializing in geospatial analytics. 
+  Be kind, warm, and professional. Use emojis where appropriate to enhance user experience. 
+  When user asks for a geospatial analysis or data, never ask for the location unless you run the analysis and you get a corresponding error. Users provide the name of their region of interest (ROI) data when requesting an analysis.
+  Always highlight important outputs and provide help in interpreting results. NEVER include map URLs or map legends/palette (like classes) in your responses.
+  Refuse to answer questions irrelevant to geospatial analytics or the platform's context. You have access to several tools. If running a tool fails, and you thought you would be to fix it with a change, try 3 times until you fix it.
   IF USER ASKS FOR DRAFTING REPORTS, YOU SHOULD RUN THE "draftReport" TOOL, AND JUST CONFIRM THE DRAFTING OF THE REPORT. YOU SHOULD NOT EVER DRAFT REPORT IN THE CHAT."
-  One of the tools is a RAG query tool that you can use to answer questions you don't know the answer to.
+  You also have access to a tool that can load geospatial data. First, run the tool that searches the database containing GEE datasets information to find the datasets best match user's request. Afterwards, run the web scraper tool to find extra info such as how to set the visualization parameter (pay attention to the code snippet from the official doc you will recieve). After that provide a short summary of what data with what parameters you're going to load to make sure if it's exactly what the user needs. After everything goes well and the user confirmed the details of the analysis to run, use all the information to load the dataset. 
+  Another tool you have access to is a RAG query tool that you can use to answer questions you don't know the answer to.
   Before running any geospatial analysis, make sure the layer name doesn't already exist in the map layers. No geospatial analysis is available for the year 2025, so you SHOULD NOT run analysis for 2025 even if the user asks for it.
   When executing analyes (not ragQueryRetrieval, though):
   1. Always provide a clear summary of what was analyzed
   2. Highlight key findings and patterns in the data,
-  3. If suitable, tabulate some parts of the results/descriptions.`;
+  3. Try to tabulate some parts of the results/descriptions for the sake of clarity.`;
 
   // Prepend system instructions to the conversation as a separate message for the AI
   const systemMessage = {
@@ -232,6 +234,139 @@ export async function POST(request: Request) {
             maxArea,
           }),
       },
+      requestLoadingGeospatialData: {
+        description: `The user has requested loading and visualizing geospatial data. You should load the data based on the user's request.`,
+        parameters: z.object({
+          geospatialDataType: z.string().describe(
+            `The type of geospatial data to load. It can be one of the following:
+      'Load GEE Data'`
+          ),
+          selectedRoiGeometry: z
+            .object({
+              type: z.string().optional(),
+              coordinates: z.array(z.array(z.array(z.number()))).optional(),
+            })
+            .optional()
+            .describe(
+              "The selected region of interest (ROI) geometry. You should run the analysis based on the user's request."
+            ),
+          dataType: z
+            .string()
+            .describe(
+              `The type of data to load. It can be one of the following: 'Image', 'ImageCollection'.`
+            ),
+
+          divideValue: z
+            .number()
+            .describe(
+              `The value to divide the image by. If based on the scraped data you didn't find it, use your logic to see if it should be set based on the dataset. Sometimes, the division is done within a "cloud mask" function, so you should extract its value from there in that case. If you decide not to set it, set it to 1.`
+            ),
+          datasetId: z.string().describe("The ID of the GEE dataset to load."),
+          startDate: z
+            .string()
+            .describe(
+              "The start date for the data to load. The date format should be 'YYYY-MM-DD'. But convert any other date format the user gives you to that one."
+            ),
+          endDate: z
+            .string()
+            .describe(
+              "The end date for the data to load. The date format should be 'YYYY-MM-DD'. But convert any other date format the user gives you to that one."
+            ),
+          visParams: z.union([
+            // single-band case
+            z.object({
+              bands: z.array(z.string()).length(1),
+              palette: z.array(z.string()),
+              min: z.number().optional(),
+              max: z.number().optional(),
+            }),
+            // multi-band case
+            z.object({
+              bands: z.array(z.string()),
+              min: z.number().optional(),
+              max: z.number().optional(),
+            }),
+          ])
+            .describe(`You should set the visualization parameters best matching user's request for the data to load and best way of visualization:
+            1) If you want to combine more than one band for visualization, set visParams using the bands: [...] attribute.
+            2) Otherwise, use the palette: [...] attribute (and do not include bands).
+            As an example, RGB visualization should be set as: {bands: ['red', 'green', 'blue']}. Forest loss should be using pellete if it's one band.
+      `),
+          labelNames: z
+            .array(z.string())
+            .describe(
+              "The label names for the data to load. You should run the analysis based on the user's request. Choose the closet label names even if it doesn't 100% match what you already know. Infer it."
+            ),
+          layerName: z
+            .string()
+            .describe(
+              "The name of the layer to be displayed. You ask the user about it if they don't provide it. Otherwise, use a name based on the function type, but make sure the name is concise and descriptive. "
+            ),
+          title: z
+            .string()
+            .optional()
+            .describe(
+              "Briefly describe the title of the analysis in one sentence confirming you're working on the user's request."
+            ),
+        }),
+        execute: async (args) => {
+          return requestLoadingGeospatialData({
+            ...args,
+            cookieStore,
+            selectedRoiGeometryInChat,
+          });
+        },
+      },
+      searchGeeDatasets: {
+        description: `Find the datasets available in Google Earth Engine (GEE) that best match the user's query.`,
+        parameters: z.object({
+          query: z.string().describe("The name of the dataset to search."),
+          startDate: z
+            .string()
+            .optional()
+            .describe(
+              "The start date for the data to load based on the scraping results. This could be the year or the date in a format. This shows the start date the data is available."
+            ),
+          endDate: z
+            .string()
+            .optional()
+            .describe(
+              "The end date for the data to load based on the scraping result. This could be the year or the date in a format. This shows the end date the data is available."
+            ),
+          title: z
+            .string()
+            .optional()
+            .describe(
+              "Briefly describe the title of the analysis in one sentence confirming you're working on the user's request."
+            ),
+        }),
+        execute: async (args) => {
+          const result = searchGeeDatasets(args.query);
+          return result;
+        },
+      },
+
+      scrapeWebpage: {
+        description:
+          "Scrape the webpage of the GEE dataset to learn what dataset_id, how data is visualized, legends, any division by a value, etc. you should use for the the requested dataset. For example, one of the things you should learn is whether you need to have a band combination (e.g., [b1, b2, b3]) or a palette (e.g., ['red', 'green', 'blue']) to visualize the image.",
+        parameters: z.object({
+          url: z
+            .string()
+            .describe(
+              "The asset URL of the webpage to scrape. The name of the column you're scraping for this parameter should be 'asset_url'."
+            ),
+          title: z
+            .string()
+            .optional()
+            .describe(
+              "Briefly describe the title of the analysis in one sentence confirming you're working on the user's request."
+            ),
+        }),
+
+        execute: async (args) => {
+          return requestWebScraping(args);
+        },
+      },
       requestRagQuery: {
         description: `The user has some documents with which a RAG has been built. If you're asked a question that you didn't know the answer, run the requestRagQuery tool that is based on user's documents to get the answer.`,
         parameters: z.object({
@@ -269,11 +404,17 @@ export async function POST(request: Request) {
       },
       checkMapLayersNames: {
         description:
-          "Your need to select a name for the geospatial analysis to be performed. Here are the the names of the current map layers. If you run a geospatial analysis, and you select a name fo the layer, you should should first check the layer names to make sure the name you selected is not already in use.",
+          "Here are the the names of the current map layers. If you run a geospatial analysis, and you select a name for the layer, you should should first check the layer names to make sure the name you selected is not already in use. You shouldn't output any message regarding the name you select.",
         parameters: z.object({
           layerName: z
             .string()
             .describe("The name of the layer to be displayed."),
+          title: z
+            .string()
+            .optional()
+            .describe(
+              "Briefly describe the title of the analysis in one sentence confirming you're working on the user's request."
+            ),
         }),
 
         execute: async (args) => {
@@ -284,200 +425,4 @@ export async function POST(request: Request) {
   });
 
   return result.toDataStreamResponse();
-}
-
-///////////////////////////////////////////////////////////////
-// Implement the tools
-///////////////////////////////////////////////////////////////
-
-// Tool to request a geospatial analysis
-async function requestGeospatialAnalysis(args: any) {
-  const {
-    functionType,
-    startDate1String,
-    endDate1String,
-    startDate2String,
-    endDate2String,
-    aggregationMethod,
-    layerName,
-    title,
-    cookieStore,
-    selectedRoiGeometryInChat,
-    maxArea,
-  } = args;
-
-  const selectedRoiGeometry = selectedRoiGeometryInChat?.geometry;
-  if (!selectedRoiGeometry) {
-    return {
-      error:
-        "It seems you didn't provide a valid region of interest (ROI) for the analysis. you need to provide an ROI through importing a shapefile/geojson file or drawing a shape on the map.",
-    };
-  }
-
-  if (
-    selectedRoiGeometry.type !== "Polygon" &&
-    selectedRoiGeometry.type !== "MultiPolygon" &&
-    selectedRoiGeometry.type !== "FeatureCollection"
-  ) {
-    return {
-      error:
-        "Selected ROI geometry must be a Polygon, MultiPolygon, or a FeatureCollection of polygons.",
-    };
-  }
-
-  // If it's a FeatureCollection, ensure every feature's geometry is a Polygon or MultiPolygon.
-  if (selectedRoiGeometry.type === "FeatureCollection") {
-    for (const feature of selectedRoiGeometry.features) {
-      if (
-        !feature.geometry ||
-        (feature.geometry.type !== "Polygon" &&
-          feature.geometry.type !== "MultiPolygon")
-      ) {
-        return {
-          error: "All features in the ROI must be polygons.",
-        };
-      }
-    }
-  }
-
-  const geometryAreaCheckResult = checkGeometryAreaIsLessThanThreshold(
-    selectedRoiGeometryInChat?.geometry,
-    maxArea
-  );
-  const areaSqKm = calculateGeometryArea(selectedRoiGeometryInChat?.geometry);
-  if (!geometryAreaCheckResult) {
-    return {
-      error: `The area of the selected region of interest (ROI) is ${areaSqKm} sq km, which exceeds the maximum area limit of ${maxArea} sq km. Please select a smaller ROI and try again.`,
-    };
-  }
-
-  const url = new URL(
-    "/api/gee/request-geospatial-analysis",
-    process.env.BASE_URL
-  );
-
-  const payload = {
-    functionType,
-    startDate1: startDate1String,
-    endDate1: endDate1String,
-    startDate2: startDate2String,
-    endDate2: endDate2String,
-    aggregationMethod,
-    selectedRoiGeometry,
-  };
-
-  try {
-    const response = await fetch(url.toString(), {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        cookie: cookieStore || "",
-      },
-      body: JSON.stringify(payload),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error(
-        "Error during fetch:",
-        errorData.error || response.statusText
-      );
-      return NextResponse.json(
-        { error: "Failed to run the analysis" },
-        { status: 500 }
-      );
-    }
-
-    const data = await response.json();
-
-    // This is not suitable for production, but it's a good way to check if the response is correct
-    if (Object.keys(data.mapStats).length === 0) {
-      return {
-        error: "Something went wrong! Failed to run the analysis.",
-      };
-    }
-    return {
-      ...data,
-      title,
-      layerName,
-      functionType,
-      startDate1: startDate1String,
-      endDate1: endDate1String,
-      startDate2: startDate2String,
-      endDate2: endDate2String,
-      aggregationMethod,
-      selectedRoiGeometry: selectedRoiGeometryInChat,
-    };
-  } catch (error) {
-    console.error("Error during fetch:", error);
-    return NextResponse.json(
-      { error: "Failed to run the analysis" },
-      { status: 500 }
-    );
-  }
-}
-
-// Tool to request a RAG query
-async function requestRagQuery(args: any) {
-  const { query, title } = args; // Extract query parameter from arguments
-
-  try {
-    const data = await answerQuery(query);
-
-    return { data, title };
-  } catch (error) {
-    console.error("Error during RAG fetch:", error);
-    return NextResponse.json({ error: "Failed to fetch RAG" }, { status: 500 });
-  }
-}
-
-// Tool to generate a report based on the conversation history
-async function draftReport(args: any) {
-  try {
-    const { messages, title, reportFileName } = args;
-
-    const relevantMessages = messages.filter(
-      (msg: any) =>
-        msg.role === "user" ||
-        (msg.role === "assistant" &&
-          !msg.content.startsWith("You are an AI Assistant"))
-    );
-
-    // Create a prompt that focuses on synthesizing the existing conversation
-    const reportPrompt = {
-      role: "user",
-      content: `Please draft a comprehensive report based on our previous conversation and analyses. The report should NOT inlcude your own comments.
-          Format it with the following structure:
-          - Introduction: Brief context and purpose
-          - Analyses Performed: Summary of conducted analyses
-          - Key Findings: Important results, patterns, and trends
-          - Limitations and Caveats: Important constraints
-          - Recommendations & Next Steps: Future suggestions."`,
-    };
-
-    // Use all relevant conversation history plus the report request
-    const conversationContext = [...relevantMessages, reportPrompt];
-
-    const reportResponse = await generateText({
-      model: openai("gpt-4o"),
-      // model: azure("gpt-4o"),
-      messages: convertToCoreMessages(conversationContext),
-      tools: {}, // Empty tools object since we don't need tools for report generation
-    });
-
-    // For simplicity here, assume it's resolved into a single string once complete.
-    const report = await reportResponse.text;
-
-    return {
-      report,
-      title,
-      reportFileName,
-    };
-  } catch (error) {
-    console.error("Error generating report:", error);
-    return NextResponse.json(
-      { error: "Failed to draft report" },
-      { status: 500 }
-    );
-  }
 }
