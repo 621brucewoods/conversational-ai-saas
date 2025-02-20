@@ -18,7 +18,6 @@ export async function POST(request: Request) {
       },
     });
 
-    console.log("Geocoding response:", response.data);
     return NextResponse.json(response.data);
   } catch (error) {
     console.error("Geocoding error:", error);

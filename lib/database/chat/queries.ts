@@ -235,3 +235,29 @@ export async function deleteChatById(chatId: string) {
 
   return { message: "Chat and associated messages deleted successfully" };
 }
+
+// Search Google Earth Engine (GEE) datasets
+export async function searchGeeDatasets(query: string) {
+  const supabase = await createClient();
+  const { data: authData, error: authError } = await supabase.auth.getUser();
+  if (authError || !authData?.user) {
+    return NextResponse.json({ message: "Unauthenticated!" }, { status: 401 });
+  }
+
+  if (!query || query.trim() === "") {
+    return [];
+  }
+
+  const { data: matches, error } = await supabase.rpc(
+    "search_gee_datasets_ft",
+    {
+      query,
+    }
+  );
+  if (error) {
+    console.error("Error performing full text search:", error);
+    return [];
+  }
+
+  return matches || [];
+}

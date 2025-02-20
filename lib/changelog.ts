@@ -7,21 +7,20 @@ const appVersion = process.env.NEXT_PUBLIC_APP_VERSION;
 export const changelog: ChangelogEntry[] = [
   {
     version: `${appVersion}`,
-    date: "2025-02-11",
+    date: "2025-02-19",
     content: `
 
   #### New Features
-  - Added support for feature collection ROIs for geospatial analysis.
-  - Added address search functionality to the map.
+  - Added a capability to load any dataset on Google Earth Engine (GEE).
+  - Add new database query function to find GEE datasets based on user's search query (given by the LLM).
+  - Added a web scraper function to retrieve information on the dataset selected for the user.
   
   #### Improvements
-  - Added better error messages for failed operations.
-  - Switched to POST request to handle large payloads when requesting geospatial analysis.
-  - Improved the project structure for better maintainability.
+  - Updated the Vercel AI SDK to have better streaming experience.
+  - Cleaned up the codebase to improve clarity.
   
   #### Bug Fixes
-  - Fixed some minor UI issues.
-  - Fixed issue with the analysis layers not being centered on the map.
+   - Fixed some minor bugs.
   
       `.trim(),
   },
