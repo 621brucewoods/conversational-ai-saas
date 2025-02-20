@@ -197,6 +197,7 @@ interface GeospatialAnalysisResult {
  */
 interface ToolCallingMessageResults {
   geospatialAnalysis?: GeospatialAnalysisResult;
+  geospatialData?: any;
   citationSources?: Source[];
   draftedReport?: string;
   toolCallTitle?: string;

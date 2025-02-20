@@ -71,6 +71,24 @@ export function CapabilitiesBanner() {
               </ul>
             </div>
 
+            {/* Group 3: Google Earth Engine Data Loading */}
+            <div className="text-left">
+              <p className="font-semibold mb-1">
+                Google Earth Engine (GEE) Data Loading (Experimental):
+              </p>
+              <ul className="list-none space-y-2 pl-4">
+                <li>
+                  <span className="mr-2">🌍</span>Load any raster dataset
+                  available on GEE
+                </li>
+
+                <li>
+                  <span className="mr-2">🔍</span>Access to a wide range of GEE
+                  datasets with a single prompt!
+                </li>
+              </ul>
+            </div>
+
             {/* Key Notes */}
             <div className="pt-2 text-left">
               <p className="font-semibold">Key Notes:</p>

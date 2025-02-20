@@ -56,6 +56,27 @@ const LSTLegend: React.FC<{ min: number; max: number; palette: string[] }> = ({
   );
 };
 
+const LCZLegend: React.FC<{ labelNames: string[]; palette: string[] }> = ({
+  labelNames,
+  palette,
+}) => {
+  return (
+    <LegendContainer>
+      <ul>
+        {labelNames.map((className, index) => (
+          <li key={index} className="flex items-center mb-1">
+            <div
+              className="w-4 h-4 rounded-full mr-2"
+              style={{ backgroundColor: palette[index] }}
+            />
+            {className}
+          </li>
+        ))}
+      </ul>
+    </LegendContainer>
+  );
+};
+
 const LCLULegend: React.FC<{ labelNames: string[]; palette: string[] }> = ({
   labelNames,
   palette,
@@ -168,10 +189,64 @@ const SusceptibilityMapLegend: React.FC<{
   );
 };
 
-const DefaultLegend: React.FC = () => {
+const DefaultLegend: React.FC<{
+  min?: number;
+  max?: number;
+  palette?: string[];
+  labelNames?: string[];
+}> = ({ min, max, palette, labelNames }) => {
+  if (!min && !max && palette?.length === 0) {
+    return (
+      <LegendContainer title="Legend">
+        <p className="text-sm text-gray-500">
+          No visualization parameters available.
+        </p>
+      </LegendContainer>
+    );
+  }
+
+  const isValidColor = (color: string): boolean => {
+    const s = new Option().style;
+    s.color = color;
+    return s.color !== "";
+  };
+
+  // If labelNames exist and contain more than one element, render a discrete legend
+  if (labelNames && (labelNames.length > 1 || palette?.length === 0)) {
+    return (
+      <LegendContainer title="Legend">
+        <ul>
+          {labelNames.map((label, index) => {
+            const color = isValidColor(label) ? label : "#ccc"; // Fallback to default if invalid
+
+            return (
+              <li key={index} className="flex items-center mb-1">
+                <div
+                  className="w-4 h-4 rounded-full mr-2"
+                  style={{ backgroundColor: color }}
+                />
+                {label}
+              </li>
+            );
+          })}
+        </ul>
+      </LegendContainer>
+    );
+  }
+
+  // Otherwise, show a continuous color gradient
+  const gradient =
+    min !== undefined && max !== undefined
+      ? generateColorGradient(min, max, palette || [])
+      : `linear-gradient(to right, ${palette?.join(", ")})`;
+
   return (
-    <LegendContainer title="Default Legend">
-      <p>No specific legend available.</p>
+    <LegendContainer>
+      <div className="flex items-center justify-between">
+        {min !== undefined && <span>{min}</span>}
+        <div className="mx-2 flex-grow h-5" style={{ background: gradient }} />
+        {max !== undefined && <span>{max}</span>}
+      </div>
     </LegendContainer>
   );
 };
@@ -194,6 +269,14 @@ const Legend: React.FC<LegendProps> = ({ layerFunctionType, layerName }) => {
     palette
   ) {
     return <LSTLegend min={min} max={max} palette={palette} />;
+  }
+
+  if (
+    layerFunctionType === "Local Climate Zone (LCZ) Maps" &&
+    labelNames &&
+    palette
+  ) {
+    return <LCZLegend labelNames={labelNames} palette={palette} />;
   }
 
   if (
@@ -252,7 +335,14 @@ const Legend: React.FC<LegendProps> = ({ layerFunctionType, layerName }) => {
   }
 
   // Fallback if no match
-  return <DefaultLegend />;
+  return (
+    <DefaultLegend
+      min={legend?.config.min}
+      max={legend?.config.max}
+      palette={legend?.config.palette}
+      labelNames={legend?.config.labelNames}
+    />
+  );
 };
 
 export default Legend;
